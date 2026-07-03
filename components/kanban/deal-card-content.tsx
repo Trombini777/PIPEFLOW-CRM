@@ -2,37 +2,15 @@ import { CalendarClock } from "lucide-react";
 
 import { cn, formatCurrency, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  dueDateFormatter,
+  dueUrgencyBadgeClassName,
+  getDueUrgency,
+} from "@/lib/deal-urgency";
 import { closedDealStages, type Deal, type Lead } from "@/lib/mock-data";
 
 export const dealCardBaseClassName =
   "flex w-full flex-col gap-2 rounded-lg border-l-4 bg-card p-3 text-left text-sm shadow-sm ring-1 ring-foreground/10 transition-all";
-
-type DueUrgency = "overdue" | "soon" | "normal" | "closed";
-
-function getDueUrgency(deal: Deal): DueUrgency {
-  if (closedDealStages.includes(deal.stage)) return "closed";
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const due = new Date(`${deal.dueDate}T00:00:00`);
-  const diffDays = Math.round((due.getTime() - today.getTime()) / 86_400_000);
-
-  if (diffDays < 0) return "overdue";
-  if (diffDays <= 3) return "soon";
-  return "normal";
-}
-
-const dueDateFormatter = new Intl.DateTimeFormat("pt-BR", {
-  day: "2-digit",
-  month: "2-digit",
-});
-
-const urgencyStyles: Record<DueUrgency, string> = {
-  overdue: "bg-destructive/10 text-destructive",
-  soon: "bg-warning/15 text-warning",
-  normal: "bg-muted text-muted-foreground",
-  closed: "bg-muted text-muted-foreground",
-};
 
 type DealCardContentProps = {
   deal: Deal;
@@ -56,7 +34,7 @@ export function DealCardContent({ deal, lead }: DealCardContentProps) {
         <span
           className={cn(
             "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
-            urgencyStyles[urgency],
+            dueUrgencyBadgeClassName[urgency],
           )}
         >
           <CalendarClock className="size-3" />
