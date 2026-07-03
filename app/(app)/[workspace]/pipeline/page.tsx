@@ -1,8 +1,6 @@
-import { KanbanSquare } from "lucide-react";
-
 import { PageHeader } from "@/components/ui/page-header";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Button } from "@/components/ui/button";
+import { KanbanBoard } from "@/components/kanban/kanban-board";
+import { mockDeals, mockLeads } from "@/lib/mock-data";
 
 export default function PipelinePage() {
   return (
@@ -10,14 +8,8 @@ export default function PipelinePage() {
       <PageHeader
         title="Pipeline"
         description="Acompanhe seus negócios em cada etapa do funil de vendas."
-        action={<Button>Novo negócio</Button>}
       />
-      <EmptyState
-        icon={KanbanSquare}
-        title="Nenhum negócio no pipeline"
-        description="Crie seu primeiro negócio para começar a organizar o funil de vendas."
-        action={<Button>Novo negócio</Button>}
-      />
+      <KanbanBoard initialDeals={mockDeals} leads={mockLeads} />
     </>
   );
 }

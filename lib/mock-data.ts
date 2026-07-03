@@ -23,6 +23,12 @@ export const mockUser: MockUser = {
   initials: "ET",
 };
 
+export const mockTeamMembers: string[] = [
+  "Eliezer Trombini",
+  "Ana Souza",
+  "Pedro Lima",
+];
+
 export type LeadStatus =
   | "novo"
   | "contatado"
@@ -449,5 +455,199 @@ export const mockActivities: Activity[] = [
     author: "Ana Souza",
     description: "Lead perdido: optou por ferramenta especializada em imóveis.",
     date: "2026-06-09T11:00:00",
+  },
+];
+
+export type DealStage =
+  | "novo_lead"
+  | "contato_realizado"
+  | "proposta_enviada"
+  | "negociacao"
+  | "fechado_ganho"
+  | "fechado_perdido";
+
+export const dealStageOptions: { value: DealStage; label: string }[] = [
+  { value: "novo_lead", label: "Novo Lead" },
+  { value: "contato_realizado", label: "Contato Realizado" },
+  { value: "proposta_enviada", label: "Proposta Enviada" },
+  { value: "negociacao", label: "Negociação" },
+  { value: "fechado_ganho", label: "Fechado Ganho" },
+  { value: "fechado_perdido", label: "Fechado Perdido" },
+];
+
+export const closedDealStages: DealStage[] = ["fechado_ganho", "fechado_perdido"];
+
+export type Deal = {
+  id: string;
+  title: string;
+  leadId: string;
+  value: number;
+  stage: DealStage;
+  owner: string;
+  dueDate: string;
+};
+
+export const mockDeals: Deal[] = [
+  {
+    id: "d1",
+    title: "Fornecimento de materiais - Grupo Alfa",
+    leadId: "1",
+    value: 18500,
+    stage: "novo_lead",
+    owner: "Eliezer Trombini",
+    dueDate: "2026-07-14",
+  },
+  {
+    id: "d2",
+    title: "Contrato de peças - Auto Peças Lima & Filhos",
+    leadId: "4",
+    value: 9200,
+    stage: "novo_lead",
+    owner: "Eliezer Trombini",
+    dueDate: "2026-07-16",
+  },
+  {
+    id: "d3",
+    title: "Projeto piloto - Escola Saber Mais",
+    leadId: "9",
+    value: 12000,
+    stage: "novo_lead",
+    owner: "Pedro Lima",
+    dueDate: "2026-07-18",
+  },
+  {
+    id: "d4",
+    title: "Consultoria técnica - Santos Engenharia",
+    leadId: "12",
+    value: 27000,
+    stage: "novo_lead",
+    owner: "Pedro Lima",
+    dueDate: "2026-07-11",
+  },
+  {
+    id: "d5",
+    title: "Parceria comercial - TechNordeste",
+    leadId: "2",
+    value: 34000,
+    stage: "contato_realizado",
+    owner: "Ana Souza",
+    dueDate: "2026-07-05",
+  },
+  {
+    id: "d6",
+    title: "Projeto de branding - Estúdio Nuvem",
+    leadId: "7",
+    value: 8500,
+    stage: "contato_realizado",
+    owner: "Eliezer Trombini",
+    dueDate: "2026-07-06",
+  },
+  {
+    id: "d7",
+    title: "Serviço de auditoria - Martins Contabilidade",
+    leadId: "10",
+    value: 6400,
+    stage: "contato_realizado",
+    owner: "Eliezer Trombini",
+    dueDate: "2026-06-30",
+  },
+  {
+    id: "d8",
+    title: "Contrato de fretes - Rota Sul",
+    leadId: "8",
+    value: 41000,
+    stage: "contato_realizado",
+    owner: "Ana Souza",
+    dueDate: "2026-07-09",
+  },
+  {
+    id: "d9",
+    title: "Fornecimento de insumos - Padaria Pão Dourado",
+    leadId: "3",
+    value: 5300,
+    stage: "proposta_enviada",
+    owner: "Pedro Lima",
+    dueDate: "2026-07-04",
+  },
+  {
+    id: "d10",
+    title: "Coleção de inverno - Moda Encanto",
+    leadId: "11",
+    value: 15800,
+    stage: "proposta_enviada",
+    owner: "Ana Souza",
+    dueDate: "2026-07-03",
+  },
+  {
+    id: "d11",
+    title: "Manutenção preventiva - Auto Peças Lima",
+    leadId: "4",
+    value: 3200,
+    stage: "proposta_enviada",
+    owner: "Eliezer Trombini",
+    dueDate: "2026-07-06",
+  },
+  {
+    id: "d12",
+    title: "Reforma do galpão - Grupo Alfa",
+    leadId: "1",
+    value: 62000,
+    stage: "negociacao",
+    owner: "Eliezer Trombini",
+    dueDate: "2026-07-07",
+  },
+  {
+    id: "d13",
+    title: "Ampliação de turmas - Escola Saber Mais",
+    leadId: "9",
+    value: 9800,
+    stage: "negociacao",
+    owner: "Pedro Lima",
+    dueDate: "2026-06-29",
+  },
+  {
+    id: "d14",
+    title: "Expansão de contrato - TechNordeste",
+    leadId: "2",
+    value: 21000,
+    stage: "negociacao",
+    owner: "Ana Souza",
+    dueDate: "2026-07-02",
+  },
+  {
+    id: "d15",
+    title: "Sistema de agendamento - Clínica Vitalis",
+    leadId: "5",
+    value: 24000,
+    stage: "fechado_ganho",
+    owner: "Ana Souza",
+    dueDate: "2026-06-12",
+  },
+  {
+    id: "d16",
+    title: "Contrato de reposição mensal - Farmácia Vida Saudável",
+    leadId: "13",
+    value: 7600,
+    stage: "fechado_ganho",
+    owner: "Eliezer Trombini",
+    dueDate: "2026-05-27",
+  },
+  {
+    id: "d17",
+    title: "Contrato de distribuição - Santa Fé",
+    leadId: "6",
+    value: 31000,
+    stage: "fechado_perdido",
+    owner: "Pedro Lima",
+    dueDate: "2026-06-04",
+  },
+  {
+    id: "d18",
+    title: "Parceria de corretagem - Ribeiro Imóveis",
+    leadId: "14",
+    value: 19500,
+    stage: "fechado_perdido",
+    owner: "Ana Souza",
+    dueDate: "2026-06-10",
   },
 ];
