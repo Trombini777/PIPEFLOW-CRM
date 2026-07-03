@@ -159,13 +159,13 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Banco de dados modelado e autenticação real conectada às telas de M2.
 
 **Entregas:**
-- [ ] Modelagem do schema (workspaces, users, memberships, leads, deals, activities)
-- [ ] Migrations no Supabase
-- [ ] Políticas de Row Level Security por workspace em todas as tabelas
+- [x] Modelagem do schema (workspaces, workspace_members, leads, deals, activities — mais subscriptions, base do M13)
+- [x] Migrations no Supabase (`supabase/migrations/20260703103000_schema_workspaces_leads_deals.sql`)
+- [x] Políticas de Row Level Security por workspace em todas as tabelas (`supabase/migrations/20260703103100_rls_policies.sql`, aplicadas e conferidas no projeto)
 - [ ] Supabase Auth conectado (login, signup, sessão)
 - [ ] Criação automática de workspace no primeiro signup (onboarding real)
 - [ ] Middleware de proteção de rotas autenticadas
-- [ ] Types gerados do Supabase integrados ao projeto
+- [x] Types gerados do Supabase integrados ao projeto (nota: `lib/supabase/types.ts` escrito manualmente a partir das migrations; substituir por `supabase gen types typescript` quando a CLI do Supabase estiver linkada ao projeto)
 
 **Commit final:** `feat: schema Supabase, RLS por workspace e autenticação real`
 
