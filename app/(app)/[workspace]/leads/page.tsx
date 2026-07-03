@@ -1,23 +1,19 @@
-import { Users } from "lucide-react";
-
 import { PageHeader } from "@/components/ui/page-header";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Button } from "@/components/ui/button";
+import { LeadsTable } from "@/components/leads/leads-table";
+import { mockLeads } from "@/lib/mock-data";
 
-export default function LeadsPage() {
+export default function LeadsPage({
+  params,
+}: {
+  params: { workspace: string };
+}) {
   return (
     <>
       <PageHeader
         title="Leads"
         description="Gerencie os contatos e oportunidades do seu workspace."
-        action={<Button>Novo lead</Button>}
       />
-      <EmptyState
-        icon={Users}
-        title="Nenhum lead cadastrado"
-        description="Cadastre seu primeiro lead para começar a acompanhar oportunidades."
-        action={<Button>Novo lead</Button>}
-      />
+      <LeadsTable workspace={params.workspace} initialLeads={mockLeads} />
     </>
   );
 }
