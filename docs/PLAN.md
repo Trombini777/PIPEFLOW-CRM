@@ -110,11 +110,11 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Board Kanban completo e interativo no client, com dados mock (sem persistência ainda).
 
 **Entregas:**
-- [ ] Board com as 6 colunas (Novo Lead → Fechado Perdido)
-- [ ] Cards de negócio (título, valor, lead vinculado, responsável, prazo)
-- [ ] Drag-and-drop entre colunas via @dnd-kit (estado local apenas)
-- [ ] Modal/formulário de criação e edição de negócio
-- [ ] Indicadores visuais de prazo próximo/vencido no card
+- [x] Board com as 6 colunas (Novo Lead → Fechado Perdido)
+- [x] Cards de negócio (título, valor, lead vinculado, responsável, prazo)
+- [x] Drag-and-drop entre colunas via @dnd-kit (estado local apenas)
+- [x] Modal/formulário de criação e edição de negócio
+- [x] Indicadores visuais de prazo próximo/vencido no card
 
 **Commit final:** `feat: pipeline Kanban com drag-and-drop client-side (UI)`
 
