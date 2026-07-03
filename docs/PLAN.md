@@ -75,11 +75,11 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Casca da área logada — sidebar, navegação e seletor de workspace, com dados mock.
 
 **Entregas:**
-- [ ] Layout autenticado (`(app)/[workspace]/layout.tsx`)
-- [ ] Sidebar com navegação (Dashboard, Leads, Pipeline, Settings)
-- [ ] Dropdown de troca de workspace (dados mock)
-- [ ] Header com avatar/menu do usuário
-- [ ] Estado vazio e responsividade (colapso da sidebar em mobile)
+- [x] Layout autenticado (`(app)/[workspace]/layout.tsx`)
+- [x] Sidebar com navegação (Dashboard, Leads, Pipeline, Settings)
+- [x] Dropdown de troca de workspace (dados mock)
+- [x] Header com avatar/menu do usuário
+- [x] Estado vazio e responsividade (colapso da sidebar em mobile)
 
 **Commit final:** `feat: shell da aplicação com sidebar e seletor de workspace (UI)`
 
