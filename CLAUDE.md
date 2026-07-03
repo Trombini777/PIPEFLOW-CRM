@@ -30,6 +30,23 @@ Escopo completo de produto, funcionalidades e personas: [docs/PRD.md](docs/PRD.m
 - Toda query ao Supabase deve respeitar o isolamento por workspace via RLS — nunca filtrar tenant só no client/query manual.
 - Commits: Conventional Commits (`feat:`, `fix:`, `chore:`, `refactor:`).
 
+## Workflow de Git, deploy e segurança
+
+Sempre que for fazer `git push` (de qualquer branch, para qualquer remoto) ou concluir um milestone:
+
+1. **Antes de subir (pre-push):** rodar uma checagem de segurança nos arquivos que serão commitados/enviados:
+   - Conferir `git status` / `git diff --staged` para ver exatamente o que vai subir.
+   - Garantir que `.env`, `.env.local`, `.env*.local`, `.vercel/` e `.claude/settings.local.json` estão no `.gitignore` e não aparecem como staged/tracked.
+   - Buscar por padrões de segredo no conteúdo que será commitado (chaves Stripe `sk_live_`/`sk_test_`/`whsec_`, chaves AWS `AKIA...`, tokens JWT, connection strings de banco, `service_role`, senhas em texto plano etc.).
+2. **Depois de subir (post-push):** confirmar de novo, já contra o histórico e o remoto:
+   - Rodar `git log --all -p | grep -inE "<padrões de segredo>"` no histórico completo (não só no último commit) para garantir que nada sensível ficou em commits antigos.
+   - Comparar `git rev-parse <branch> origin/<branch>` para confirmar que o que subiu é exatamente o que foi revisado localmente.
+3. **Relatório do milestone:** ao finalizar um milestone (ou qualquer commit/push relevante), sempre apresentar ao usuário, em texto:
+   - O que foi feito/entregue nessa etapa.
+   - Como foi a análise de segurança (pre-push e post-push) — o que foi checado e o resultado.
+
+Esse processo é obrigatório antes e depois de qualquer push neste projeto, não apenas quando pedido explicitamente.
+
 ## Estrutura de pastas
 
 ```
