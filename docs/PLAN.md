@@ -127,10 +127,10 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Dashboard visual completo, com dados mock.
 
 **Entregas:**
-- [ ] Cards de métricas (total de leads, negócios abertos, valor total do pipeline, taxa de conversão)
-- [ ] Gráfico de funil de vendas (Recharts, dados mock)
-- [ ] Lista de negócios do usuário com prazo próximo
-- [ ] Responsividade do grid de widgets
+- [x] Cards de métricas (total de leads, negócios abertos, valor total do pipeline, taxa de conversão)
+- [x] Gráfico de funil de vendas (Recharts, dados mock)
+- [x] Lista de negócios do usuário com prazo próximo
+- [x] Responsividade do grid de widgets
 
 **Commit final:** `feat: dashboard de métricas com gráfico de funil (UI)`
 
