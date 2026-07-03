@@ -92,11 +92,11 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Listagem e detalhe de leads completos visualmente, com dados mock.
 
 **Entregas:**
-- [ ] Listagem de leads (tabela) com dados mock
-- [ ] Busca e filtros (por status, responsável, data) — client-side sobre mock
-- [ ] Formulário de cadastro/edição de lead (nome, e-mail, telefone, empresa, cargo, status)
-- [ ] Página de detalhe do lead (perfil completo)
-- [ ] Timeline de atividades no detalhe do lead (mock)
+- [x] Listagem de leads (tabela) com dados mock
+- [ ] Busca e filtros (por status, responsável, data) — client-side sobre mock (feito: busca por nome/empresa e filtro por status; faltam filtros por responsável e data)
+- [x] Formulário de cadastro/edição de lead (nome, e-mail, telefone, empresa, cargo, status)
+- [x] Página de detalhe do lead (perfil completo)
+- [x] Timeline de atividades no detalhe do lead (mock)
 - [ ] Formulário de registro de atividade (ligação, e-mail, reunião, nota)
 
 **Commit final:** `feat: listagem, detalhe e timeline de leads (UI)`
