@@ -1,0 +1,2 @@
+-- Dados de seed do PipeFlow CRM.
+-- Populado a partir de M8 (Supabase: Schema, RLS) em diante.
