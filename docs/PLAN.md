@@ -57,12 +57,12 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Telas de login, cadastro e onboarding inicial, sem lógica de autenticação real (formulários funcionais visualmente, submissão mockada).
 
 **Entregas:**
-- [ ] Tela de Login
-- [ ] Tela de Cadastro (Signup)
+- [x] Tela de Login
+- [x] Tela de Cadastro (Signup)
 - [ ] Tela de aceite de convite de colaborador
-- [ ] Fluxo de onboarding (criação do primeiro workspace, passos iniciais)
-- [ ] Validação de formulário no client (Zod + react-hook-form)
-- [ ] Estados de erro/loading nos formulários
+- [x] Fluxo de onboarding (criação do primeiro workspace, passos iniciais)
+- [x] Validação de formulário no client (Zod + react-hook-form)
+- [x] Estados de erro/loading nos formulários
 
 **Commit final:** `feat: telas de autenticação e onboarding (UI)`
 
