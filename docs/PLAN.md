@@ -19,14 +19,14 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Ter o projeto Next.js rodando localmente com toda a base técnica configurada, sem nenhuma feature de produto ainda.
 
 **Entregas:**
-- [ ] Criar projeto Next.js 14 (App Router) + TypeScript 5
-- [ ] Configurar Tailwind CSS + inicializar shadcn/ui
-- [ ] Configurar ESLint + Prettier
-- [ ] Criar estrutura de pastas conforme [CLAUDE.md](../CLAUDE.md) (`app/`, `components/`, `lib/`, `supabase/`)
-- [ ] Configurar fontes (Inter/Geist) e tokens de tema (cores primária/neutros/semânticas)
-- [ ] Criar repositório Git + primeiro push para GitHub
-- [ ] Configurar `.env.example` com variáveis previstas (Supabase, Stripe, Resend)
-- [ ] Conectar projeto à Vercel (deploy inicial de "hello world")
+- [x] Criar projeto Next.js 14 (App Router) + TypeScript 5
+- [x] Configurar Tailwind CSS + inicializar shadcn/ui
+- [x] Configurar ESLint + Prettier
+- [x] Criar estrutura de pastas conforme [CLAUDE.md](../CLAUDE.md) (`app/`, `components/`, `lib/`, `supabase/`)
+- [x] Configurar fontes (Inter/Geist) e tokens de tema (cores primária/neutros/semânticas)
+- [x] Criar repositório Git + primeiro push para GitHub
+- [x] Configurar `.env.example` com variáveis previstas (Supabase, Stripe, Resend)
+- [x] Conectar projeto à Vercel (deploy inicial de "hello world")
 
 **Commit final:** `chore: setup inicial do projeto Next.js com Tailwind, shadcn/ui e estrutura de pastas`
 
