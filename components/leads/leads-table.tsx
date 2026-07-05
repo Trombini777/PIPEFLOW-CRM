@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MoreHorizontal, Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -33,12 +33,15 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
 import { LeadFormDialog } from "@/components/leads/lead-form-dialog";
 import { DeleteLeadDialog } from "@/components/leads/delete-lead-dialog";
-import { leadStatusOptions, type Lead } from "@/lib/mock-data";
+import { leadStatusOptions, type Lead } from "@/lib/domain";
+import { createLead, deleteLead, updateLead } from "@/lib/actions/leads";
 import type { LeadInput } from "@/lib/validations/lead";
 
 type LeadsTableProps = {
   workspace: string;
-  initialLeads: Lead[];
+  leads: Lead[];
+  initialSearch: string;
+  initialStatus: Lead["status"] | "all";
 };
 
 type StatusFilter = "all" | Lead["status"];
@@ -50,30 +53,62 @@ const statusFilterLabels: Record<StatusFilter, string> = {
   ),
 } as Record<StatusFilter, string>;
 
-export function LeadsTable({ workspace, initialLeads }: LeadsTableProps) {
+export function LeadsTable({
+  workspace,
+  leads,
+  initialSearch,
+  initialStatus,
+}: LeadsTableProps) {
   const router = useRouter();
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
+
+  const [search, setSearch] = useState(initialSearch);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatus);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | undefined>();
   const [deletingLead, setDeletingLead] = useState<Lead | undefined>();
 
-  const filteredLeads = useMemo(() => {
-    const query = search.trim().toLowerCase();
+  function updateQuery(next: { q?: string; status?: StatusFilter }) {
+    const params = new URLSearchParams(searchParams.toString());
+    const q = next.q ?? search;
+    const status = next.status ?? statusFilter;
 
-    return leads.filter((lead) => {
-      const matchesQuery =
-        !query ||
-        lead.name.toLowerCase().includes(query) ||
-        lead.company.toLowerCase().includes(query);
-      const matchesStatus =
-        statusFilter === "all" || lead.status === statusFilter;
+    if (q) {
+      params.set("q", q);
+    } else {
+      params.delete("q");
+    }
 
-      return matchesQuery && matchesStatus;
+    if (status && status !== "all") {
+      params.set("status", status);
+    } else {
+      params.delete("status");
+    }
+
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`);
     });
-  }, [leads, search, statusFilter]);
+  }
+
+  // Busca no banco é debounced para não disparar uma navegação por tecla.
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (search !== initialSearch) {
+        updateQuery({ q: search });
+      }
+    }, 400);
+
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  function handleStatusChange(value: StatusFilter) {
+    setStatusFilter(value);
+    updateQuery({ status: value });
+  }
 
   function handleCreate() {
     setEditingLead(undefined);
@@ -85,28 +120,25 @@ export function LeadsTable({ workspace, initialLeads }: LeadsTableProps) {
     setFormOpen(true);
   }
 
-  function handleFormSubmit(values: LeadInput) {
-    if (editingLead) {
-      setLeads((current) =>
-        current.map((lead) =>
-          lead.id === editingLead.id ? { ...lead, ...values } : lead,
-        ),
-      );
-      return;
+  async function handleFormSubmit(values: LeadInput) {
+    const result = editingLead
+      ? await updateLead(workspace, editingLead.id, values)
+      : await createLead(workspace, values);
+
+    if (!result.error) {
+      router.refresh();
     }
 
-    const newLead: Lead = {
-      ...values,
-      id: crypto.randomUUID(),
-      owner: "Eliezer Trombini",
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-    setLeads((current) => [newLead, ...current]);
+    return result;
   }
 
-  function handleDeleteConfirm() {
-    if (!deletingLead) return;
-    setLeads((current) => current.filter((lead) => lead.id !== deletingLead.id));
+  async function handleDeleteConfirm() {
+    if (!deletingLead) return { error: null };
+    const result = await deleteLead(workspace, deletingLead.id);
+    if (!result.error) {
+      router.refresh();
+    }
+    return result;
   }
 
   return (
@@ -125,7 +157,7 @@ export function LeadsTable({ workspace, initialLeads }: LeadsTableProps) {
 
           <Select
             value={statusFilter}
-            onValueChange={(value) => setStatusFilter(value as StatusFilter)}
+            onValueChange={(value) => value && handleStatusChange(value)}
           >
             <SelectTrigger className="w-full sm:w-48">
               <SelectValue>
@@ -148,7 +180,7 @@ export function LeadsTable({ workspace, initialLeads }: LeadsTableProps) {
         </Button>
       </div>
 
-      {filteredLeads.length === 0 ? (
+      {leads.length === 0 ? (
         <EmptyState
           icon={Search}
           title="Nenhum lead encontrado"
@@ -170,7 +202,7 @@ export function LeadsTable({ workspace, initialLeads }: LeadsTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredLeads.map((lead) => (
+              {leads.map((lead) => (
                 <TableRow key={lead.id}>
                   <TableCell>
                     <Link
@@ -190,7 +222,7 @@ export function LeadsTable({ workspace, initialLeads }: LeadsTableProps) {
                     {lead.role}
                   </TableCell>
                   <TableCell className="hidden text-muted-foreground lg:table-cell">
-                    {lead.owner}
+                    {lead.ownerName}
                   </TableCell>
                   <TableCell>
                     <LeadStatusBadge status={lead.status} />

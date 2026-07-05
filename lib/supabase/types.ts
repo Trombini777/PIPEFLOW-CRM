@@ -34,6 +34,8 @@ export type SubscriptionStatus =
   | "canceled"
   | "incomplete";
 
+export type InviteStatus = "pending" | "accepted" | "revoked";
+
 export type Database = {
   public: {
     Tables: {
@@ -242,6 +244,27 @@ export type Database = {
           },
         ];
       };
+      profiles: {
+        Row: {
+          id: string;
+          email: string;
+          full_name: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          email: string;
+          full_name?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          full_name?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       subscriptions: {
         Row: {
           id: string;
@@ -285,6 +308,52 @@ export type Database = {
           },
         ];
       };
+      workspace_invites: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          email: string;
+          role: WorkspaceMemberRole;
+          token: string;
+          invited_by: string | null;
+          status: InviteStatus;
+          expires_at: string;
+          accepted_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          email: string;
+          role?: WorkspaceMemberRole;
+          token?: string;
+          invited_by?: string | null;
+          status?: InviteStatus;
+          expires_at?: string;
+          accepted_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          email?: string;
+          role?: WorkspaceMemberRole;
+          token?: string;
+          invited_by?: string | null;
+          status?: InviteStatus;
+          expires_at?: string;
+          accepted_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workspace_invites_workspace_id_fkey";
+            columns: ["workspace_id"];
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -295,6 +364,19 @@ export type Database = {
       is_workspace_admin: {
         Args: { _workspace_id: string };
         Returns: boolean;
+      };
+      get_invite_preview: {
+        Args: { _token: string };
+        Returns: {
+          workspace_name: string;
+          email: string;
+          role: WorkspaceMemberRole;
+          status: InviteStatus;
+        }[];
+      };
+      accept_workspace_invite: {
+        Args: { _token: string };
+        Returns: string;
       };
     };
     Enums: Record<string, never>;

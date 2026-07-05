@@ -13,31 +13,31 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { FormFieldError } from "@/components/auth/form-field-error";
-import type { Lead } from "@/lib/domain";
+import type { Collaborator } from "@/lib/domain";
 
-type DeleteLeadDialogProps = {
+type RemoveMemberDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  lead?: Lead;
+  collaborator?: Collaborator;
   onConfirm: () => Promise<{ error: string | null }>;
 };
 
-export function DeleteLeadDialog({
+export function RemoveMemberDialog({
   open,
   onOpenChange,
-  lead,
+  collaborator,
   onConfirm,
-}: DeleteLeadDialogProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
+}: RemoveMemberDialogProps) {
+  const [isRemoving, setIsRemoving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleConfirm() {
-    setIsDeleting(true);
+    setIsRemoving(true);
     setError(null);
 
     const result = await onConfirm();
 
-    setIsDeleting(false);
+    setIsRemoving(false);
 
     if (result.error) {
       setError(result.error);
@@ -57,11 +57,13 @@ export function DeleteLeadDialog({
     >
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Excluir lead</DialogTitle>
+          <DialogTitle>Remover colaborador</DialogTitle>
           <DialogDescription>
-            Tem certeza que deseja excluir{" "}
-            <span className="font-medium text-foreground">{lead?.name}</span>?
-            Essa ação não pode ser desfeita.
+            Tem certeza que deseja remover{" "}
+            <span className="font-medium text-foreground">
+              {collaborator?.name}
+            </span>{" "}
+            deste workspace? A pessoa perde acesso imediatamente.
           </DialogDescription>
         </DialogHeader>
         <FormFieldError message={error ?? undefined} />
@@ -69,17 +71,17 @@ export function DeleteLeadDialog({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isDeleting}
+            disabled={isRemoving}
           >
             Cancelar
           </Button>
           <Button
             variant="destructive"
             onClick={handleConfirm}
-            disabled={isDeleting}
+            disabled={isRemoving}
           >
-            {isDeleting && <Loader2 className="size-4 animate-spin" />}
-            {isDeleting ? "Excluindo..." : "Excluir"}
+            {isRemoving && <Loader2 className="size-4 animate-spin" />}
+            {isRemoving ? "Removendo..." : "Remover"}
           </Button>
         </DialogFooter>
       </DialogContent>

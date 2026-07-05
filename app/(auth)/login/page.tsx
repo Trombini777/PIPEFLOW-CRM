@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -20,7 +21,11 @@ import { FormFieldError } from "@/components/auth/form-field-error";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { signIn } from "@/lib/actions/auth";
 
-export default function LoginPage() {
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? undefined;
+  const prefillEmail = searchParams.get("email") ?? "";
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -30,14 +35,14 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: prefillEmail, password: "" },
   });
 
   async function onSubmit(data: LoginInput) {
     setIsSubmitting(true);
     setServerError(null);
 
-    const result = await signIn(data);
+    const result = await signIn(data, redirectTo);
 
     // Em caso de sucesso, signIn() já chamou redirect() no servidor — a
     // navegação já está em curso e result vem undefined aqui.
@@ -126,5 +131,13 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

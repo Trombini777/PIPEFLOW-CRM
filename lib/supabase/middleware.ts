@@ -47,7 +47,11 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/api") || pathname.startsWith("/auth/callback")) {
+  if (
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/auth/callback") ||
+    pathname.startsWith("/invite/")
+  ) {
     return supabaseResponse;
   }
 

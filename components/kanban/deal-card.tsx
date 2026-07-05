@@ -9,7 +9,7 @@ import {
   DealCardContent,
   dealCardBaseClassName,
 } from "@/components/kanban/deal-card-content";
-import type { Deal, Lead } from "@/lib/mock-data";
+import type { Deal, Lead } from "@/lib/domain";
 
 type DealCardProps = {
   deal: Deal;

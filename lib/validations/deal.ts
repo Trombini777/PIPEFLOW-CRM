@@ -12,7 +12,7 @@ export const dealSchema = z.object({
     "fechado_ganho",
     "fechado_perdido",
   ]),
-  owner: z.string().min(2, "Informe o responsável."),
+  ownerId: z.string().min(1, "Selecione o responsável."),
   dueDate: z.string().min(1, "Informe o prazo."),
 });
 

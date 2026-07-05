@@ -5,7 +5,7 @@ import {
   activityTypeLabels,
   type Activity,
   type ActivityType,
-} from "@/lib/mock-data";
+} from "@/lib/domain";
 
 const activityIcons: Record<ActivityType, LucideIcon> = {
   ligacao: Phone,
@@ -68,7 +68,7 @@ export function LeadTimeline({ activities }: LeadTimelineProps) {
                 {activity.description}
               </p>
               <p className="text-xs text-muted-foreground">
-                por {activity.author}
+                por {activity.authorName}
               </p>
             </div>
           </li>

@@ -15,7 +15,10 @@ export type AuthActionResult = {
   needsEmailConfirmation?: boolean;
 };
 
-export async function signIn(input: LoginInput): Promise<AuthActionResult> {
+export async function signIn(
+  input: LoginInput,
+  redirectTo?: string,
+): Promise<AuthActionResult> {
   const parsed = loginSchema.safeParse(input);
 
   if (!parsed.success) {
@@ -29,12 +32,16 @@ export async function signIn(input: LoginInput): Promise<AuthActionResult> {
     return { error: "E-mail ou senha inválidos." };
   }
 
-  // Sessão criada — o middleware decide o destino (workspace existente ou
-  // onboarding), então basta redirecionar para a raiz.
-  redirect("/");
+  // Sessão criada — se veio de um link com destino específico (ex.: aceitar
+  // um convite), volta pra lá; senão o middleware decide (workspace
+  // existente ou onboarding) a partir da raiz.
+  redirect(redirectTo || "/");
 }
 
-export async function signUp(input: SignupInput): Promise<AuthActionResult> {
+export async function signUp(
+  input: SignupInput,
+  redirectTo?: string,
+): Promise<AuthActionResult> {
   const parsed = signupSchema.safeParse(input);
 
   if (!parsed.success) {
@@ -47,7 +54,9 @@ export async function signUp(input: SignupInput): Promise<AuthActionResult> {
     password: parsed.data.password,
     options: {
       data: { name: parsed.data.name },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback${
+        redirectTo ? `?next=${encodeURIComponent(redirectTo)}` : ""
+      }`,
     },
   });
 
@@ -61,12 +70,13 @@ export async function signUp(input: SignupInput): Promise<AuthActionResult> {
   }
 
   // Se o projeto Supabase exige confirmação de e-mail, nenhuma sessão volta
-  // aqui — o usuário só é autenticado ao clicar no link (app/auth/callback).
+  // aqui — o usuário só é autenticado ao clicar no link (app/auth/callback),
+  // que já recebe o redirectTo via "next".
   if (!data.session) {
     return { error: null, needsEmailConfirmation: true };
   }
 
-  redirect("/onboarding");
+  redirect(redirectTo || "/onboarding");
 }
 
 export async function signOut(): Promise<void> {

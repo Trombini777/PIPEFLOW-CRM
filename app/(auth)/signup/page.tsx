@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, MailCheck } from "lucide-react";
@@ -21,7 +22,11 @@ import { FormFieldError } from "@/components/auth/form-field-error";
 import { signupSchema, type SignupInput } from "@/lib/validations/auth";
 import { signUp } from "@/lib/actions/auth";
 
-export default function SignupPage() {
+function SignupForm() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? undefined;
+  const prefillEmail = searchParams.get("email") ?? "";
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
@@ -34,7 +39,7 @@ export default function SignupPage() {
     resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
-      email: "",
+      email: prefillEmail,
       password: "",
       confirmPassword: "",
       acceptTerms: false,
@@ -45,7 +50,7 @@ export default function SignupPage() {
     setIsSubmitting(true);
     setServerError(null);
 
-    const result = await signUp(data);
+    const result = await signUp(data, redirectTo);
 
     // Em caso de sucesso sem confirmação de e-mail, signUp() já chamou
     // redirect() no servidor — a navegação já está em curso e result vem
@@ -210,5 +215,13 @@ export default function SignupPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
   );
 }

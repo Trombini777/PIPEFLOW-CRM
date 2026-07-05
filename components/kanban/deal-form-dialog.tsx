@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -27,19 +27,19 @@ import { FormFieldError } from "@/components/auth/form-field-error";
 import { dealSchema, type DealInput } from "@/lib/validations/deal";
 import {
   dealStageOptions,
-  mockLeads,
-  mockTeamMembers,
   type Deal,
   type DealStage,
-} from "@/lib/mock-data";
+  type Lead,
+  type WorkspaceMember,
+} from "@/lib/domain";
 
-function emptyValues(defaultStage: DealStage): DealInput {
+function emptyValues(defaultStage: DealStage, members: WorkspaceMember[]): DealInput {
   return {
     title: "",
     leadId: "",
     value: 0,
     stage: defaultStage,
-    owner: mockTeamMembers[0],
+    ownerId: members[0]?.userId ?? "",
     dueDate: new Date().toISOString().slice(0, 10),
   };
 }
@@ -49,7 +49,9 @@ type DealFormDialogProps = {
   onOpenChange: (open: boolean) => void;
   deal?: Deal;
   defaultStage: DealStage;
-  onSubmit: (values: DealInput) => void;
+  leads: Lead[];
+  members: WorkspaceMember[];
+  onSubmit: (values: DealInput) => Promise<{ error: string | null }>;
 };
 
 export function DealFormDialog({
@@ -57,9 +59,12 @@ export function DealFormDialog({
   onOpenChange,
   deal,
   defaultStage,
+  leads,
+  members,
   onSubmit,
 }: DealFormDialogProps) {
   const isEditing = !!deal;
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     control,
@@ -68,18 +73,36 @@ export function DealFormDialog({
     formState: { errors, isSubmitting },
   } = useForm<DealInput>({
     resolver: zodResolver(dealSchema),
-    defaultValues: emptyValues(defaultStage),
+    defaultValues: emptyValues(defaultStage, members),
   });
 
   useEffect(() => {
     if (open) {
-      reset(deal ? { ...deal } : emptyValues(defaultStage));
+      setServerError(null);
+      reset(
+        deal
+          ? {
+              title: deal.title,
+              leadId: deal.leadId,
+              value: deal.value,
+              stage: deal.stage,
+              ownerId: deal.ownerId ?? "",
+              dueDate: deal.dueDate,
+            }
+          : emptyValues(defaultStage, members),
+      );
     }
-  }, [open, deal, defaultStage, reset]);
+  }, [open, deal, defaultStage, members, reset]);
 
   async function handleFormSubmit(values: DealInput) {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    onSubmit(values);
+    setServerError(null);
+    const result = await onSubmit(values);
+
+    if (result.error) {
+      setServerError(result.error);
+      return;
+    }
+
     onOpenChange(false);
   }
 
@@ -132,13 +155,13 @@ export function DealFormDialog({
                   <SelectTrigger id="deal-lead" className="w-full">
                     <SelectValue placeholder="Selecione um lead">
                       {(value: string) => {
-                        const lead = mockLeads.find((item) => item.id === value);
+                        const lead = leads.find((item) => item.id === value);
                         return lead ? `${lead.name} — ${lead.company}` : "Selecione um lead";
                       }}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {mockLeads.map((lead) => (
+                    {leads.map((lead) => (
                       <SelectItem key={lead.id} value={lead.id}>
                         {lead.name} — {lead.company}
                       </SelectItem>
@@ -204,7 +227,7 @@ export function DealFormDialog({
               <Label htmlFor="deal-owner">Responsável</Label>
               <Controller
                 control={control}
-                name="owner"
+                name="ownerId"
                 render={({ field }) => (
                   <Select
                     value={field.value}
@@ -212,19 +235,23 @@ export function DealFormDialog({
                     disabled={isSubmitting}
                   >
                     <SelectTrigger id="deal-owner" className="w-full">
-                      <SelectValue>{(value: string) => value}</SelectValue>
+                      <SelectValue placeholder="Selecione um responsável">
+                        {(value: string) =>
+                          members.find((member) => member.userId === value)?.name
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      {mockTeamMembers.map((member) => (
-                        <SelectItem key={member} value={member}>
-                          {member}
+                      {members.map((member) => (
+                        <SelectItem key={member.userId} value={member.userId}>
+                          {member.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 )}
               />
-              <FormFieldError message={errors.owner?.message} />
+              <FormFieldError message={errors.ownerId?.message} />
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -259,6 +286,8 @@ export function DealFormDialog({
               <FormFieldError message={errors.stage?.message} />
             </div>
           </div>
+
+          <FormFieldError message={serverError ?? undefined} />
 
           <DialogFooter className="-mx-0 -mb-0 mt-2 rounded-none border-t-0 bg-transparent p-0 sm:flex-row sm:justify-end">
             <Button

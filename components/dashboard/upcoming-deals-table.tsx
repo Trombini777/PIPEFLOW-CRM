@@ -65,11 +65,11 @@ export function UpcomingDealsTable({ deals }: UpcomingDealsTableProps) {
                       <div className="flex items-center gap-2">
                         <Avatar size="sm">
                           <AvatarFallback>
-                            {getInitials(deal.owner)}
+                            {getInitials(deal.ownerName)}
                           </AvatarFallback>
                         </Avatar>
                         <span className="text-muted-foreground">
-                          {deal.owner}
+                          {deal.ownerName}
                         </span>
                       </div>
                     </TableCell>

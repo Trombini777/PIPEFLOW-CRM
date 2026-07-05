@@ -1,27 +1,35 @@
 import { notFound } from "next/navigation";
 
 import { LeadDetailView } from "@/components/leads/lead-detail-view";
-import { mockActivities, mockLeads } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/server";
+import { getWorkspaceBySlug } from "@/lib/workspace";
+import { getLeadById } from "@/lib/queries/leads";
+import { listActivitiesByLead } from "@/lib/queries/activities";
 
-export default function LeadDetailPage({
+export default async function LeadDetailPage({
   params,
 }: {
   params: { workspace: string; id: string };
 }) {
-  const lead = mockLeads.find((item) => item.id === params.id);
+  const supabase = await createClient();
+  const workspace = await getWorkspaceBySlug(supabase, params.workspace);
+
+  if (!workspace) {
+    notFound();
+  }
+
+  const lead = await getLeadById(supabase, workspace.id, params.id);
 
   if (!lead) {
     notFound();
   }
 
-  const activities = mockActivities.filter(
-    (activity) => activity.leadId === lead.id,
-  );
+  const activities = await listActivitiesByLead(supabase, workspace.id, lead.id);
 
   return (
     <LeadDetailView
       workspace={params.workspace}
-      initialLead={lead}
+      lead={lead}
       activities={activities}
     />
   );
