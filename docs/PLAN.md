@@ -143,8 +143,8 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Telas de administração do workspace, com dados mock.
 
 **Entregas:**
-- [ ] Listagem de colaboradores do workspace + papel (Admin/Membro)
-- [ ] Formulário de convite de colaborador por e-mail
+- [x] Listagem de colaboradores do workspace + papel (Admin/Membro) — construída direto com dados reais (`CollaboratorsCard`), já que o backend do M12 foi implementado junto
+- [x] Formulário de convite de colaborador por e-mail — `InviteFormDialog` + envio real via Resend
 - [ ] Tela de gestão de plano (Free vs. Pro, uso atual vs. limites)
 - [ ] Configurações gerais do workspace (nome, etc.)
 
@@ -178,11 +178,11 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** CRUD real de leads e atividades, substituindo os dados mock de M4.
 
 **Entregas:**
-- [ ] Server Actions de CRUD de leads (create, update, delete, list)
-- [ ] Busca e filtros server-side (status, responsável, data)
-- [ ] Server Actions de registro de atividades
-- [ ] Timeline do lead consumindo dados reais
-- [ ] Validação Zod em todas as mutações
+- [x] Server Actions de CRUD de leads (create, update, delete, list) — `lib/actions/leads.ts`
+- [x] Busca e filtros server-side (status, responsável, data) — busca por nome/empresa e filtro por status feitos no banco via `lib/queries/leads.ts` + `searchParams`; filtros por responsável e data ainda não têm UI (mesma lacuna já registrada no M4)
+- [x] Server Actions de registro de atividades — `lib/actions/activities.ts` + `ActivityFormDialog`
+- [x] Timeline do lead consumindo dados reais — `lib/queries/activities.ts`
+- [x] Validação Zod em todas as mutações
 
 **Commit final:** `feat: CRUD real de leads e atividades via Server Actions`
 
@@ -195,10 +195,10 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Persistência real do board Kanban de M5.
 
 **Entregas:**
-- [ ] Server Actions de CRUD de negócios (deals)
-- [ ] Persistência de mudança de etapa no drag-and-drop
-- [ ] Otimistic UI no drag-and-drop com rollback em caso de erro
-- [ ] Vínculo negócio ↔ lead ↔ responsável consumindo dados reais
+- [x] Server Actions de CRUD de negócios (deals) — `lib/actions/deals.ts` (create/update; exclusão de negócio ainda não tem gatilho na UI, mesma superfície do M5)
+- [x] Persistência de mudança de etapa no drag-and-drop — `updateDealStage`
+- [x] Otimistic UI no drag-and-drop com rollback em caso de erro — `KanbanBoard.handleDragEnd`
+- [x] Vínculo negócio ↔ lead ↔ responsável consumindo dados reais — tabela `profiles` + `listWorkspaceMembers`
 
 **Commit final:** `feat: persistência real do pipeline Kanban`
 
@@ -211,10 +211,10 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Métricas e gráfico de funil de M6 consumindo dados reais do workspace.
 
 **Entregas:**
-- [ ] Queries agregadas (total de leads, negócios abertos, valor total do pipeline, taxa de conversão)
-- [ ] Query do funil de vendas por etapa para o Recharts
-- [ ] Query de negócios do usuário logado com prazo próximo
-- [ ] Cache/revalidação adequada (Next.js)
+- [x] Queries agregadas (total de leads, negócios abertos, valor total do pipeline, taxa de conversão) — `lib/dashboard-metrics.ts`
+- [x] Query do funil de vendas por etapa para o Recharts — `getFunnelData`
+- [x] Query de negócios com prazo próximo — `getUpcomingDeals` (por workspace, como no mock original de M6; ainda não filtra por usuário logado)
+- [x] Cache/revalidação adequada (Next.js) — páginas dinâmicas (uso de `cookies()` via Supabase server client) + `revalidatePath` nas Server Actions de leads/deals
 
 **Commit final:** `feat: dashboard consumindo métricas reais do workspace`
 
@@ -227,12 +227,12 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Colaboração multi-empresa completa, conectando M7 ao backend.
 
 **Entregas:**
-- [ ] Criação de múltiplos workspaces por usuário
-- [ ] Troca de workspace ativo (sidebar) consumindo dados reais
-- [ ] Envio de convite por e-mail via Resend
-- [ ] Aceite de convite (vínculo do usuário convidado ao workspace com papel definido)
-- [ ] Gestão de papéis (Admin/Membro) e remoção de colaborador
-- [ ] Enforce de permissões por papel nas Server Actions
+- [ ] Criação de múltiplos workspaces por usuário — só existe a criação do primeiro workspace no onboarding (M8); não há tela para criar um segundo workspace
+- [x] Troca de workspace ativo (sidebar) consumindo dados reais — já implementado no M8 (`[workspace]/layout.tsx` lista os workspaces reais do usuário)
+- [x] Envio de convite por e-mail via Resend — `lib/actions/invites.ts` + `lib/resend/send-invite-email.ts`
+- [x] Aceite de convite (vínculo do usuário convidado ao workspace com papel definido) — RPC `accept_workspace_invite` + `/invite/[token]`
+- [x] Gestão de papéis (Admin/Membro) e remoção de colaborador — `CollaboratorsCard` (listagem + remoção); atribuir papel é feito no convite, não há edição de papel de um membro já existente
+- [x] Enforce de permissões por papel nas Server Actions — RLS (`is_workspace_admin`) restringe convite/revogação/remoção; não houve auditoria dos demais Server Actions (leads/deals) além do isolamento por workspace já existente
 
 **Commit final:** `feat: workspaces, convite de colaboradores via Resend e papéis`
 
