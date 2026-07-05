@@ -2,7 +2,8 @@
 
 import { LogOut, Settings, User } from "lucide-react";
 
-import { mockUser } from "@/lib/mock-data";
+import { getInitials } from "@/lib/utils";
+import { signOut } from "@/lib/actions/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -14,7 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function UserMenu() {
+type UserMenuProps = {
+  user: {
+    name: string;
+    email: string;
+  };
+};
+
+export function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -22,17 +30,17 @@ export function UserMenu() {
         aria-label="Menu do usuário"
       >
         <Avatar>
-          <AvatarFallback>{mockUser.initials}</AvatarFallback>
+          <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex flex-col gap-0.5 py-1.5">
             <span className="text-sm font-medium text-foreground">
-              {mockUser.name}
+              {user.name}
             </span>
             <span className="truncate text-xs font-normal text-muted-foreground">
-              {mockUser.email}
+              {user.email}
             </span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
@@ -48,7 +56,7 @@ export function UserMenu() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive">
+        <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
           <LogOut />
           Sair
         </DropdownMenuItem>

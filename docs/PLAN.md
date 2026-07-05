@@ -162,9 +162,9 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 - [x] Modelagem do schema (workspaces, workspace_members, leads, deals, activities — mais subscriptions, base do M13)
 - [x] Migrations no Supabase (`supabase/migrations/20260703103000_schema_workspaces_leads_deals.sql`)
 - [x] Políticas de Row Level Security por workspace em todas as tabelas (`supabase/migrations/20260703103100_rls_policies.sql`, aplicadas e conferidas no projeto)
-- [ ] Supabase Auth conectado (login, signup, sessão)
-- [ ] Criação automática de workspace no primeiro signup (onboarding real)
-- [ ] Middleware de proteção de rotas autenticadas
+- [x] Supabase Auth conectado (login, signup, sessão) — Server Actions em `lib/actions/auth.ts` + callback em `app/auth/callback/route.ts`
+- [x] Criação automática de workspace no primeiro signup (onboarding real) — `lib/actions/workspaces.ts`, trigger `handle_new_workspace` cria membership admin + subscription free
+- [x] Middleware de proteção de rotas autenticadas — `middleware.ts` + `lib/supabase/middleware.ts`
 - [x] Types gerados do Supabase integrados ao projeto (nota: `lib/supabase/types.ts` escrito manualmente a partir das migrations; substituir por `supabase gen types typescript` quando a CLI do Supabase estiver linkada ao projeto)
 
 **Commit final:** `feat: schema Supabase, RLS por workspace e autenticação real`

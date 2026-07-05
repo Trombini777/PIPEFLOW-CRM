@@ -13,13 +13,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
-import { WorkspaceSwitcher } from "@/components/layout/workspace-switcher";
+import {
+  WorkspaceSwitcher,
+  type WorkspaceSummary,
+} from "@/components/layout/workspace-switcher";
 
 type MobileNavProps = {
   workspace: string;
+  workspaces: WorkspaceSummary[];
 };
 
-export function MobileNav({ workspace }: MobileNavProps) {
+export function MobileNav({ workspace, workspaces }: MobileNavProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -61,6 +65,7 @@ export function MobileNav({ workspace }: MobileNavProps) {
         <div className="border-t border-border p-3">
           <WorkspaceSwitcher
             workspace={workspace}
+            workspaces={workspaces}
             onNavigate={() => setOpen(false)}
           />
         </div>
