@@ -39,12 +39,12 @@ Convenção de branch: `feat/NN-nome-do-milestone`. Convenção de commit: Conve
 **Objetivo:** Página pública de apresentação do produto, completa e responsiva.
 
 **Entregas:**
-- [ ] Seção Hero (proposta de valor, CTA principal)
-- [ ] Seção Funcionalidades (destaques: Kanban, Leads, Dashboard, Multi-empresa)
-- [ ] Seção Planos e Preços (Free vs. Pro)
-- [ ] Seção CTA final
-- [ ] Header e footer públicos
-- [ ] Responsividade mobile/desktop
+- [x] Seção Hero (proposta de valor, CTA principal)
+- [x] Seção Funcionalidades (destaques: Kanban, Leads, Dashboard, Multi-empresa)
+- [x] Seção Planos e Preços (Free vs. Pro)
+- [x] Seção CTA final
+- [x] Header e footer públicos
+- [x] Responsividade mobile/desktop
 
 **Commit final:** `feat: landing page com hero, funcionalidades, pricing e CTA`
 
