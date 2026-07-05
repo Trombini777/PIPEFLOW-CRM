@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -19,11 +19,15 @@ import {
 } from "@/components/ui/card";
 import { FormFieldError } from "@/components/auth/form-field-error";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
-import { mockWorkspaces } from "@/lib/mock-data";
+import { signIn } from "@/lib/actions/auth";
 
-export default function LoginPage() {
-  const router = useRouter();
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? undefined;
+  const prefillEmail = searchParams.get("email") ?? "";
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     control,
@@ -31,15 +35,21 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: prefillEmail, password: "" },
   });
 
-  async function onSubmit() {
+  async function onSubmit(data: LoginInput) {
     setIsSubmitting(true);
-    // Sem autenticação real ainda (M2 é só UI) — o login é simulado e sempre
-    // redireciona para o dashboard do primeiro workspace mock.
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    router.push(`/${mockWorkspaces[0].slug}/dashboard`);
+    setServerError(null);
+
+    const result = await signIn(data, redirectTo);
+
+    // Em caso de sucesso, signIn() já chamou redirect() no servidor — a
+    // navegação já está em curso e result vem undefined aqui.
+    if (result?.error) {
+      setServerError(result.error);
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -104,6 +114,8 @@ export default function LoginPage() {
               <FormFieldError message={errors.password?.message} />
             </div>
 
+            <FormFieldError message={serverError ?? undefined} />
+
             <Button type="submit" className="mt-2 w-full" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="size-4 animate-spin" />}
               {isSubmitting ? "Entrando..." : "Entrar"}
@@ -119,5 +131,13 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

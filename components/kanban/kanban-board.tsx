@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   DndContext,
   DragOverlay,
@@ -25,17 +26,34 @@ import {
   type Deal,
   type DealStage,
   type Lead,
-} from "@/lib/mock-data";
+  type WorkspaceMember,
+} from "@/lib/domain";
+import { createDeal, updateDeal, updateDealStage } from "@/lib/actions/deals";
 import type { DealInput } from "@/lib/validations/deal";
 
 type KanbanBoardProps = {
+  workspace: string;
   initialDeals: Deal[];
   leads: Lead[];
+  members: WorkspaceMember[];
 };
 
-export function KanbanBoard({ initialDeals, leads }: KanbanBoardProps) {
+export function KanbanBoard({
+  workspace,
+  initialDeals,
+  leads,
+  members,
+}: KanbanBoardProps) {
+  const router = useRouter();
   const [deals, setDeals] = useState<Deal[]>(initialDeals);
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  // Re-sincroniza com os dados do servidor após router.refresh() (ex.: uma
+  // criação/edição bem-sucedida), sem perder a atualização otimista do
+  // drag-and-drop, que já resolveu antes desse efeito rodar de novo.
+  useEffect(() => {
+    setDeals(initialDeals);
+  }, [initialDeals]);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | undefined>();
@@ -58,17 +76,29 @@ export function KanbanBoard({ initialDeals, leads }: KanbanBoardProps) {
     setActiveId(String(event.active.id));
   }
 
-  function handleDragEnd(event: DragEndEvent) {
+  async function handleDragEnd(event: DragEndEvent) {
     setActiveId(null);
     const { active, over } = event;
     if (!over) return;
 
+    const dealId = String(active.id);
     const targetStage = over.id as DealStage;
+    const previousDeal = deals.find((deal) => deal.id === dealId);
+    if (!previousDeal || previousDeal.stage === targetStage) return;
+
     setDeals((current) =>
       current.map((deal) =>
-        deal.id === active.id ? { ...deal, stage: targetStage } : deal,
+        deal.id === dealId ? { ...deal, stage: targetStage } : deal,
       ),
     );
+
+    const result = await updateDealStage(workspace, dealId, targetStage);
+
+    if (result.error) {
+      setDeals((current) =>
+        current.map((deal) => (deal.id === dealId ? previousDeal : deal)),
+      );
+    }
   }
 
   function handleAddDeal(stage: DealStage) {
@@ -83,18 +113,16 @@ export function KanbanBoard({ initialDeals, leads }: KanbanBoardProps) {
     setFormOpen(true);
   }
 
-  function handleFormSubmit(values: DealInput) {
-    if (editingDeal) {
-      setDeals((current) =>
-        current.map((deal) =>
-          deal.id === editingDeal.id ? { ...deal, ...values } : deal,
-        ),
-      );
-      return;
+  async function handleFormSubmit(values: DealInput) {
+    const result = editingDeal
+      ? await updateDeal(workspace, editingDeal.id, values)
+      : await createDeal(workspace, values);
+
+    if (!result.error) {
+      router.refresh();
     }
 
-    const newDeal: Deal = { ...values, id: crypto.randomUUID() };
-    setDeals((current) => [...current, newDeal]);
+    return result;
   }
 
   return (
@@ -148,6 +176,8 @@ export function KanbanBoard({ initialDeals, leads }: KanbanBoardProps) {
         onOpenChange={setFormOpen}
         deal={editingDeal}
         defaultStage={defaultStage}
+        leads={leads}
+        members={members}
         onSubmit={handleFormSubmit}
       />
     </div>

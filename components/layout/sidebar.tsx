@@ -1,13 +1,17 @@
 import Link from "next/link";
 
 import { SidebarNav } from "@/components/layout/sidebar-nav";
-import { WorkspaceSwitcher } from "@/components/layout/workspace-switcher";
+import {
+  WorkspaceSwitcher,
+  type WorkspaceSummary,
+} from "@/components/layout/workspace-switcher";
 
 type SidebarProps = {
   workspace: string;
+  workspaces: WorkspaceSummary[];
 };
 
-export function Sidebar({ workspace }: SidebarProps) {
+export function Sidebar({ workspace, workspaces }: SidebarProps) {
   return (
     <aside
       data-slot="sidebar"
@@ -30,7 +34,7 @@ export function Sidebar({ workspace }: SidebarProps) {
       </div>
 
       <div className="border-t border-sidebar-border p-3">
-        <WorkspaceSwitcher workspace={workspace} />
+        <WorkspaceSwitcher workspace={workspace} workspaces={workspaces} />
       </div>
     </aside>
   );

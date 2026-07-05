@@ -33,31 +33,51 @@ import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
 import { LeadFormDialog } from "@/components/leads/lead-form-dialog";
 import { DeleteLeadDialog } from "@/components/leads/delete-lead-dialog";
 import { LeadTimeline } from "@/components/leads/lead-timeline";
-import type { Activity, Lead } from "@/lib/mock-data";
+import { ActivityFormDialog } from "@/components/leads/activity-form-dialog";
+import { updateLead, deleteLead } from "@/lib/actions/leads";
+import { createActivity } from "@/lib/actions/activities";
+import type { Activity, Lead } from "@/lib/domain";
 import type { LeadInput } from "@/lib/validations/lead";
+import type { ActivityInput } from "@/lib/validations/activity";
 
 type LeadDetailViewProps = {
   workspace: string;
-  initialLead: Lead;
+  lead: Lead;
   activities: Activity[];
 };
 
 export function LeadDetailView({
   workspace,
-  initialLead,
+  lead,
   activities,
 }: LeadDetailViewProps) {
   const router = useRouter();
-  const [lead, setLead] = useState(initialLead);
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [activityFormOpen, setActivityFormOpen] = useState(false);
 
-  function handleSubmit(values: LeadInput) {
-    setLead((current) => ({ ...current, ...values }));
+  async function handleSubmit(values: LeadInput) {
+    const result = await updateLead(workspace, lead.id, values);
+    if (!result.error) {
+      router.refresh();
+    }
+    return result;
   }
 
-  function handleDeleteConfirm() {
-    router.push(`/${workspace}/leads`);
+  async function handleDeleteConfirm() {
+    const result = await deleteLead(workspace, lead.id);
+    if (!result.error) {
+      router.push(`/${workspace}/leads`);
+    }
+    return result;
+  }
+
+  async function handleActivitySubmit(values: ActivityInput) {
+    const result = await createActivity(workspace, lead.id, values);
+    if (!result.error) {
+      router.refresh();
+    }
+    return result;
   }
 
   return (
@@ -75,24 +95,32 @@ export function LeadDetailView({
         title={lead.name}
         description={`${lead.role} · ${lead.company}`}
         action={
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="outline" />}>
-              Ações
-              <MoreHorizontal className="size-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setFormOpen(true)}>
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setDeleteOpen(true)}
-              >
-                Excluir
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setActivityFormOpen(true)}
+            >
+              Registrar atividade
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger render={<Button variant="outline" />}>
+                Ações
+                <MoreHorizontal className="size-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setFormOpen(true)}>
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  Excluir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       />
 
@@ -123,7 +151,7 @@ export function LeadDetailView({
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
               <User className="size-4 shrink-0" />
-              <span>Responsável: {lead.owner}</span>
+              <span>Responsável: {lead.ownerName}</span>
             </div>
           </CardContent>
         </Card>
@@ -152,6 +180,11 @@ export function LeadDetailView({
         onOpenChange={setDeleteOpen}
         lead={lead}
         onConfirm={handleDeleteConfirm}
+      />
+      <ActivityFormDialog
+        open={activityFormOpen}
+        onOpenChange={setActivityFormOpen}
+        onSubmit={handleActivitySubmit}
       />
     </>
   );

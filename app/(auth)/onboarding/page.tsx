@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -21,11 +20,11 @@ import {
   onboardingSchema,
   type OnboardingInput,
 } from "@/lib/validations/auth";
-import { slugify } from "@/lib/utils";
+import { createWorkspace } from "@/lib/actions/workspaces";
 
 export default function OnboardingPage() {
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     control,
@@ -38,11 +37,16 @@ export default function OnboardingPage() {
 
   async function onSubmit(data: OnboardingInput) {
     setIsSubmitting(true);
-    // Sem backend ainda (M2 é só UI) — a criação do workspace é simulada e
-    // sempre redireciona para o dashboard do workspace recém-criado.
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    const slug = slugify(data.workspaceName) || "meu-workspace";
-    router.push(`/${slug}/dashboard`);
+    setServerError(null);
+
+    const result = await createWorkspace(data);
+
+    // Em caso de sucesso, createWorkspace() já chamou redirect() no servidor
+    // — a navegação já está em curso e result vem undefined aqui.
+    if (result?.error) {
+      setServerError(result.error);
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -79,6 +83,8 @@ export default function OnboardingPage() {
               />
               <FormFieldError message={errors.workspaceName?.message} />
             </div>
+
+            <FormFieldError message={serverError ?? undefined} />
 
             <Button type="submit" className="mt-2 w-full" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="size-4 animate-spin" />}

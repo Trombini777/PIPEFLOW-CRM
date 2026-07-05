@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { FormFieldError } from "@/components/auth/form-field-error";
 import { leadSchema, type LeadInput } from "@/lib/validations/lead";
-import { leadStatusOptions, type Lead } from "@/lib/mock-data";
+import { leadStatusOptions, type Lead } from "@/lib/domain";
 
 const emptyValues: LeadInput = {
   name: "",
@@ -40,7 +40,7 @@ type LeadFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   lead?: Lead;
-  onSubmit: (values: LeadInput) => void;
+  onSubmit: (values: LeadInput) => Promise<{ error: string | null }>;
 };
 
 export function LeadFormDialog({
@@ -50,6 +50,7 @@ export function LeadFormDialog({
   onSubmit,
 }: LeadFormDialogProps) {
   const isEditing = !!lead;
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     control,
@@ -63,13 +64,20 @@ export function LeadFormDialog({
 
   useEffect(() => {
     if (open) {
+      setServerError(null);
       reset(lead ? { ...lead } : emptyValues);
     }
   }, [open, lead, reset]);
 
   async function handleFormSubmit(values: LeadInput) {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    onSubmit(values);
+    setServerError(null);
+    const result = await onSubmit(values);
+
+    if (result.error) {
+      setServerError(result.error);
+      return;
+    }
+
     onOpenChange(false);
   }
 
@@ -217,6 +225,8 @@ export function LeadFormDialog({
             />
             <FormFieldError message={errors.status?.message} />
           </div>
+
+          <FormFieldError message={serverError ?? undefined} />
 
           <DialogFooter className="-mx-0 -mb-0 mt-2 rounded-none border-t-0 bg-transparent p-0 sm:flex-row sm:justify-end">
             <Button

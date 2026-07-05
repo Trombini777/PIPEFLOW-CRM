@@ -7,7 +7,7 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { dealStageStyles } from "@/components/kanban/deal-stage-style";
 import { DealCard } from "@/components/kanban/deal-card";
-import type { Deal, DealStage, Lead } from "@/lib/mock-data";
+import type { Deal, DealStage, Lead } from "@/lib/domain";
 
 type KanbanColumnProps = {
   stage: DealStage;

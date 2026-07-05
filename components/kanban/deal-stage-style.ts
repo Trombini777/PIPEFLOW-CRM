@@ -1,4 +1,4 @@
-import type { DealStage } from "@/lib/mock-data";
+import type { DealStage } from "@/lib/domain";
 
 type StageStyle = {
   rail: string;

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, MailCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,10 +20,16 @@ import {
 } from "@/components/ui/card";
 import { FormFieldError } from "@/components/auth/form-field-error";
 import { signupSchema, type SignupInput } from "@/lib/validations/auth";
+import { signUp } from "@/lib/actions/auth";
 
-export default function SignupPage() {
-  const router = useRouter();
+function SignupForm() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? undefined;
+  const prefillEmail = searchParams.get("email") ?? "";
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
 
   const {
     control,
@@ -33,19 +39,49 @@ export default function SignupPage() {
     resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
-      email: "",
+      email: prefillEmail,
       password: "",
       confirmPassword: "",
       acceptTerms: false,
     },
   });
 
-  async function onSubmit() {
+  async function onSubmit(data: SignupInput) {
     setIsSubmitting(true);
-    // Sem backend ainda (M2 é só UI) — o cadastro é simulado e sempre segue
-    // para o onboarding, onde o primeiro workspace é criado.
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    router.push("/onboarding");
+    setServerError(null);
+
+    const result = await signUp(data, redirectTo);
+
+    // Em caso de sucesso sem confirmação de e-mail, signUp() já chamou
+    // redirect() no servidor — a navegação já está em curso e result vem
+    // undefined aqui.
+    if (result?.error) {
+      setServerError(result.error);
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (result?.needsEmailConfirmation) {
+      setNeedsEmailConfirmation(true);
+      setIsSubmitting(false);
+    }
+  }
+
+  if (needsEmailConfirmation) {
+    return (
+      <div className="flex w-full max-w-sm flex-col gap-4">
+        <Card>
+          <CardHeader>
+            <MailCheck className="size-8 text-primary" />
+            <CardTitle>Confirme seu e-mail</CardTitle>
+            <CardDescription>
+              Enviamos um link de confirmação para o seu e-mail. Clique nele
+              para ativar sua conta e continuar o cadastro.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -162,6 +198,8 @@ export default function SignupPage() {
               <FormFieldError message={errors.acceptTerms?.message} />
             </div>
 
+            <FormFieldError message={serverError ?? undefined} />
+
             <Button type="submit" className="mt-2 w-full" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="size-4 animate-spin" />}
               {isSubmitting ? "Criando conta..." : "Criar conta"}
@@ -177,5 +215,13 @@ export default function SignupPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
   );
 }

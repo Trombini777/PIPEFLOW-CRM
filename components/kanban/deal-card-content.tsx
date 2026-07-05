@@ -7,7 +7,7 @@ import {
   dueUrgencyBadgeClassName,
   getDueUrgency,
 } from "@/lib/deal-urgency";
-import { closedDealStages, type Deal, type Lead } from "@/lib/mock-data";
+import { closedDealStages, type Deal, type Lead } from "@/lib/domain";
 
 export const dealCardBaseClassName =
   "flex w-full flex-col gap-2 rounded-lg border-l-4 bg-card p-3 text-left text-sm shadow-sm ring-1 ring-foreground/10 transition-all";
@@ -43,7 +43,7 @@ export function DealCardContent({ deal, lead }: DealCardContentProps) {
             : dueDateFormatter.format(new Date(`${deal.dueDate}T00:00:00`))}
         </span>
         <Avatar size="sm">
-          <AvatarFallback>{getInitials(deal.owner)}</AvatarFallback>
+          <AvatarFallback>{getInitials(deal.ownerName)}</AvatarFallback>
         </Avatar>
       </div>
     </>

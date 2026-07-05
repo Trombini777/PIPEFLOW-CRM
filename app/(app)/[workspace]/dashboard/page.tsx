@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+
 import { PageHeader } from "@/components/ui/page-header";
 import { MetricCards } from "@/components/dashboard/metric-cards";
 import { SalesFunnelChart } from "@/components/dashboard/sales-funnel-chart";
@@ -7,11 +9,31 @@ import {
   getFunnelData,
   getUpcomingDeals,
 } from "@/lib/dashboard-metrics";
+import { createClient } from "@/lib/supabase/server";
+import { getWorkspaceBySlug } from "@/lib/workspace";
+import { listLeads } from "@/lib/queries/leads";
+import { listDeals } from "@/lib/queries/deals";
 
-export default function DashboardPage() {
-  const metrics = getDashboardMetrics();
-  const funnelData = getFunnelData();
-  const upcomingDeals = getUpcomingDeals();
+export default async function DashboardPage({
+  params,
+}: {
+  params: { workspace: string };
+}) {
+  const supabase = await createClient();
+  const workspace = await getWorkspaceBySlug(supabase, params.workspace);
+
+  if (!workspace) {
+    notFound();
+  }
+
+  const [leads, deals] = await Promise.all([
+    listLeads(supabase, workspace.id),
+    listDeals(supabase, workspace.id),
+  ]);
+
+  const metrics = getDashboardMetrics(leads, deals);
+  const funnelData = getFunnelData(deals);
+  const upcomingDeals = getUpcomingDeals(leads, deals);
 
   return (
     <>

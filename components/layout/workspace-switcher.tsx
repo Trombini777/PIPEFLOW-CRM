@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { Building2, ChevronsUpDown, Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { mockWorkspaces } from "@/lib/mock-data";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,23 +14,35 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+export type WorkspaceSummary = {
+  id: string;
+  name: string;
+  slug: string;
+  plan: "free" | "pro";
+};
+
 type WorkspaceSwitcherProps = {
   workspace: string;
+  workspaces: WorkspaceSummary[];
   onNavigate?: () => void;
 };
 
 export function WorkspaceSwitcher({
   workspace,
+  workspaces,
   onNavigate,
 }: WorkspaceSwitcherProps) {
   const router = useRouter();
   const activeWorkspace =
-    mockWorkspaces.find((item) => item.slug === workspace) ??
-    mockWorkspaces[0];
+    workspaces.find((item) => item.slug === workspace) ?? workspaces[0];
 
   function handleSelect(slug: string) {
     router.push(`/${slug}/dashboard`);
     onNavigate?.();
+  }
+
+  if (!activeWorkspace) {
+    return null;
   }
 
   return (
@@ -57,7 +68,7 @@ export function WorkspaceSwitcher({
         <DropdownMenuGroup>
           <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {mockWorkspaces.map((item) => (
+          {workspaces.map((item) => (
             <DropdownMenuItem
               key={item.id}
               onClick={() => handleSelect(item.slug)}

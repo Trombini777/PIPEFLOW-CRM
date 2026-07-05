@@ -1,5 +1,5 @@
 import { Badge, type badgeVariants } from "@/components/ui/badge";
-import { leadStatusOptions, type LeadStatus } from "@/lib/mock-data";
+import { leadStatusOptions, type LeadStatus } from "@/lib/domain";
 import type { VariantProps } from "class-variance-authority";
 
 const statusVariant: Record<

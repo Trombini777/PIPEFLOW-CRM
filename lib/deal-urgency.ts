@@ -1,4 +1,4 @@
-import { closedDealStages, type Deal } from "@/lib/mock-data";
+import { closedDealStages, type Deal } from "@/lib/domain";
 
 export type DueUrgency = "overdue" | "soon" | "normal" | "closed";
 
